@@ -7,14 +7,59 @@ Created on Sun May  5 22:25:18 2019
 """
 import data_preprocessing as pre
 import global_vals as global_vals
+import csv
+from time import gmtime, strftime
 
 class main_script:
+    
     def __init__(self):
         preprocess = pre.data_preprocess()
         self.dataset = preprocess.clean()
+        self.file_init = False
+        self.file_name = 'feature_outputs/'
         
     def get_dataset(self):
         return self.dataset
+    
+    def write_features(self,feature_vector,row_count):
+        if(self.file_init == False):
+            self.file_name += strftime("%Y-%m-%d %H:%M:%S", gmtime())+".csv"
+            self.file_init = True
+            header = ['index','max_speed','max_rotation','max_acc','avg_acc','avg_rotation','avg_speed','min_acc','min_speed','min_rotation','score']
+            with open(self.file_name, 'w') as writeFile:
+                writer = csv.writer(writeFile)
+                writer.writerow(header)
+            writeFile.close()
+        else:
+            score = 10.0
+            if (feature_vector['max_speed'] > 12.5):
+                score = score - 0.4
+            elif (feature_vector['max_speed'] >14.0):
+                score = score - 2.0
+            elif (feature_vector['max_speed'] > 18.0): 
+                score = score - 5.0
+            if (feature_vector['avg_speed'] >12.5):
+                score = score - 0.6
+            #no need for other speed conditions since max conditions covers them
+            if (feature_vector['max_rotation'] >0.1):
+                score = score - 0.2
+            elif (feature_vector['max_rotation'] >0.8):
+                score = score - 0.5
+            if (feature_vector['avg_rotation'] >0.1):
+                score = score - 0.3
+            if (feature_vector['max_acc'] >1.5 and feature_vector['max_acc'] <2.0):
+                score = score - 1.5
+            elif (feature_vector['max_acc'] >1.0 and feature_vector['max_acc'] <2.0):
+                score = score - 0.7
+            if (feature_vector['avg_acc'] >1.0):
+                score = score - 0.1
+            #since avg acc is not reliable
+            feature_vector = list(feature_vector.values())
+            feature_vector = [row_count]+feature_vector+[score]
+            with open(self.file_name, 'a') as writeFile:
+                writer = csv.writer(writeFile)
+                writer.writerow(feature_vector)
+            writeFile.close()
     
     def generate_feature_vectors(self):
         self.data_rows = self.dataset.iloc[:,:-1].values.tolist()
@@ -43,9 +88,9 @@ class main_script:
                 max_rotation = abs(gyro[row_count+count]) if abs(gyro[row_count+count])>max_rotation else max_rotation
                 max_acc = abs(acc[row_count+count]) if abs(acc[row_count+count])>max_acc else max_acc
 
-                avg_speed+=speed[row_count+count]
-                avg_acc+=acc[row_count+count]
-                avg_rotation+=gyro[row_count+count]
+                avg_speed+=abs(speed[row_count+count])
+                avg_acc+=abs(acc[row_count+count])
+                avg_rotation+=abs(gyro[row_count+count])
                 
                 min_speed = abs(speed[row_count+count]) if abs(speed[row_count+count])<min_speed else min_speed
                 min_rotation = abs(gyro[row_count+count]) if abs(gyro[row_count+count])<min_rotation else min_rotation
@@ -66,6 +111,9 @@ class main_script:
                 feature_element['min_acc'] = min_acc
                 feature_element['min_speed'] = min_speed
                 feature_element['min_rotation'] = min_rotation
+                
+                self.write_features(feature_element,row_count)
+                
                 
                 self.feature_vector[row_count] = feature_element
 
