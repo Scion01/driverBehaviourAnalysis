@@ -12,7 +12,7 @@ import glob
 
 class data_preprocess:
     def __init__(self):
-        pathRegex = "*.csv"
+        pathRegex = "Sat May 11 00_06_39 GMT+05_30 2019 Values.csv"
         source_files = glob.glob(pathRegex)
         #if the current directory has multiple files then datatset can be an array, right now
         #it is intialised with the last file
@@ -22,5 +22,8 @@ class data_preprocess:
         self.dataset = self.dataset[np.isfinite(self.dataset['LAT'])]
         self.dataset = self.dataset[np.isfinite(self.dataset['LONG'])]
         self.dataset = self.dataset[np.isfinite(self.dataset['Speed'])]
+        self.dataset = self.dataset[np.isfinite(self.dataset['accX'])]
+        self.dataset = self.dataset[np.isfinite(self.dataset['accY'])]
+        self.dataset = self.dataset[np.isfinite(self.dataset['accZ'])]
         return self.dataset
         

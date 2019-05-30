@@ -21,6 +21,23 @@ class main_script:
     def get_dataset(self):
         return self.dataset
     
+    def generate_features_csv(self,feature_vector,row_count):
+        if(self.file_init == False):
+            self.file_name += strftime("%Y-%m-%d %H:%M:%S", gmtime())+".csv"
+            self.file_init = True
+            header = ['index','max_speed','max_rotation','max_acc','avg_acc','avg_rotation','avg_speed','min_acc','min_speed','min_rotation']
+            with open(self.file_name, 'w') as writeFile:
+                writer = csv.writer(writeFile)
+                writer.writerow(header)
+            writeFile.close()
+        else:
+            feature_vector = list(feature_vector.values())
+            feature_vector = [row_count]+feature_vector
+            with open(self.file_name, 'a') as writeFile:
+                writer = csv.writer(writeFile)
+                writer.writerow(feature_vector)
+            writeFile.close()
+    
     def write_features(self,feature_vector,row_count):
         if(self.file_init == False):
             self.file_name += strftime("%Y-%m-%d %H:%M:%S", gmtime())+".csv"
@@ -112,7 +129,11 @@ class main_script:
                 feature_element['min_speed'] = min_speed
                 feature_element['min_rotation'] = min_rotation
                 
-                self.write_features(feature_element,row_count)
+                
+                if global_vals.train_mode == True:
+                    self.write_features(feature_element,row_count)
+                else:
+                    self.generate_features_csv(feature_element,row_count)
                 
                 
                 self.feature_vector[row_count] = feature_element

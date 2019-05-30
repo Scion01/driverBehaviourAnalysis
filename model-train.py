@@ -23,7 +23,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Importing the dataset
-dataset = pd.read_csv('feature_outputs/2019-05-28 15:51:19.csv')
+dataset = pd.read_csv('feature_outputs/2019-05-30 04:58:50.csv')
 X = dataset.iloc[:, 1:7].values
 y = dataset.iloc[:, 10].values
 
@@ -72,15 +72,26 @@ model.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid
 #https://towardsdatascience.com/common-loss-functions-in-machine-learning-46af0ffc4d23 for about loss function
 model.compile(optimizer = 'adam', loss = 'mean_squared_error', metrics = ['accuracy'])
 
+
+
 # Fitting the ANN to the Training set
 #The batch size defines the number of samples that will be propagated through the network.
 #lets say u have 55 entries and u keep the batch_size as 10, then 5 entires would never be used for training
 model.fit(X_train, y_train, batch_size = 10, nb_epoch = 100)
 
+
+model_json = model.to_json()
+with open("model_dba.json", "w") as json_file:
+    json_file.write(model_json)
+ 
+model.save_weights("model_dba.h5")
+
+
 #Making the predictions and evaluating the model
 
 # Predicting the Test set results
 y_pred = model.predict(X_test)
+
 
 cor_pred =0
 incor_pred =0
@@ -97,15 +108,15 @@ y_pred_label = [None]*len(y_pred)
 y_test_label = [None]*len(y_test)
 for i in range(0,len(y_pred)):
     if(y_pred[i]<=0.81):
-        y_pred_label[i]="Bad"
+        y_pred_label[i]="Poor"
     elif(y_pred[i]>0.81 and y_pred[i]<=0.86):
-        y_pred_label[i]="Ok"
+        y_pred_label[i]="Bad"
     else:
         y_pred_label[i]="Good"
     if(y_test[i]<=0.81):
-        y_test_label[i]="Bad"
+        y_test_label[i]="Poor"
     elif(y_test[i]>0.81 and y_test[i]<=0.86):
-        y_test_label[i]="Ok"
+        y_test_label[i]="Bad"
     else:
         y_test_label[i]="Good"
 
