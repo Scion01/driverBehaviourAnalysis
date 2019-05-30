@@ -5,7 +5,6 @@ Created on Tue May 28 17:07:52 2019
 
 @author: scion01
 """
-
 # Installing Theano
 # pip install --upgrade --no-deps git+git://github.com/Theano/Theano.git
 
@@ -107,15 +106,11 @@ for i in range(0,len(y_pred)):
 y_pred_label = [None]*len(y_pred)
 y_test_label = [None]*len(y_test)
 for i in range(0,len(y_pred)):
-    if(y_pred[i]<=0.81):
-        y_pred_label[i]="Poor"
-    elif(y_pred[i]>0.81 and y_pred[i]<=0.86):
+    if(y_pred[i]<0.90):
         y_pred_label[i]="Bad"
     else:
         y_pred_label[i]="Good"
-    if(y_test[i]<=0.81):
-        y_test_label[i]="Poor"
-    elif(y_test[i]>0.81 and y_test[i]<=0.86):
+    if(y_test[i]<0.90):
         y_test_label[i]="Bad"
     else:
         y_test_label[i]="Good"
