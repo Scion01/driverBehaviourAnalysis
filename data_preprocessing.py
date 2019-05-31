@@ -11,8 +11,8 @@ import glob
 
 
 class data_preprocess:
-    def __init__(self):
-        pathRegex = "Sat May 11 00_06_39 GMT+05_30 2019 Values.csv"
+    def __init__(self, file_name):
+        pathRegex = file_name
         source_files = glob.glob(pathRegex)
         #if the current directory has multiple files then datatset can be an array, right now
         #it is intialised with the last file

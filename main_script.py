@@ -12,8 +12,8 @@ from time import gmtime, strftime
 
 class main_script:
     
-    def __init__(self):
-        preprocess = pre.data_preprocess()
+    def __init__(self,file):
+        preprocess = pre.data_preprocess(file)
         self.dataset = preprocess.clean()
         self.file_init = False
         self.file_name = 'feature_outputs/'
@@ -25,6 +25,7 @@ class main_script:
         if(self.file_init == False):
             self.file_name += strftime("%Y-%m-%d %H:%M:%S", gmtime())+".csv"
             self.file_init = True
+            print("Inside header")
             header = ['index','max_speed','max_rotation','max_acc','avg_acc','avg_rotation','avg_speed','min_acc','min_speed','min_rotation']
             with open(self.file_name, 'w') as writeFile:
                 writer = csv.writer(writeFile)
@@ -86,6 +87,7 @@ class main_script:
         acc = self.dataset.accZ.values
         gyro = self.dataset.gyroZ.values
         print(len(self.data_rows))
+        sample_size_used = global_vals.sample_size
         for row_count in range(len(self.data_rows)):
             feature_element = {}
             max_speed = 0
@@ -98,9 +100,10 @@ class main_script:
             min_rotation = 999
             avg_rotation = 0
             count=0
-            if (row_count+global_vals.sample_size>len(self.data_rows)):
-                global_vals.sample_size = global_vals.sample_size - row_count - 1
-            while count in range(global_vals.sample_size):
+            
+            if (row_count+sample_size_used>len(self.data_rows)):
+                sample_size_used = sample_size_used - row_count - 1
+            while count in range(sample_size_used):
                 max_speed = abs(speed[row_count+count]) if abs(speed[row_count+count])>max_speed else max_speed
                 max_rotation = abs(gyro[row_count+count]) if abs(gyro[row_count+count])>max_rotation else max_rotation
                 max_acc = abs(acc[row_count+count]) if abs(acc[row_count+count])>max_acc else max_acc
@@ -115,9 +118,9 @@ class main_script:
                 count+=1
             
             if(count>0):
-                avg_acc/=global_vals.sample_size
-                avg_speed/=global_vals.sample_size
-                avg_rotation/=global_vals.sample_size
+                avg_acc/=sample_size_used
+                avg_speed/=sample_size_used
+                avg_rotation/=sample_size_used
                 
                 feature_element['max_speed'] = max_speed
                 feature_element['max_rotation'] = max_rotation
@@ -138,8 +141,11 @@ class main_script:
                 
                 self.feature_vector[row_count] = feature_element
 
-        return self.feature_vector
+        #return self.feature_vector
+        return self.file_name
 
 
-main_script_obj = main_script()
-print(main_script_obj.generate_feature_vectors())
+# =============================================================================
+# main_script_obj = main_script()
+# print(main_script_obj.generate_feature_vectors())
+# =============================================================================

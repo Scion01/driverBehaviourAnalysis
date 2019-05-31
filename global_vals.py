@@ -8,4 +8,4 @@ Created on Sun May  5 23:15:59 2019
 
 sample_size = 10
 dev_mode = True
-train_mode = True
+train_mode = False
